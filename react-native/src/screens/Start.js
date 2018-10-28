@@ -10,6 +10,7 @@ import {
   View
 } from 'react-native';
 import { StackActions, NavigationActions } from 'react-navigation';
+import axios from 'axios';
 
 class Start extends Component {
   static navigationOptions = {
@@ -22,7 +23,8 @@ class Start extends Component {
 
   state = {
     username: '',
-    loadedUsername: false
+    loadedUsername: '',
+    loaded: false
   };
 
   componentWillMount() {
@@ -30,16 +32,14 @@ class Start extends Component {
   }
 
   _loadUsername = async () => {
-    const { navigate } = this.props.navigation;
-
     try {
       const value = await AsyncStorage.getItem('username');
 
       if (!!value) this._resetNavigation();
       else {
         this.setState({
-          username: value || '',
-          loadedUsername: true
+          loadedUsername: value || '',
+          loaded: true
         });
       }
     } catch (error) {
@@ -57,14 +57,14 @@ class Start extends Component {
   _validateUsername = () => {
     const { username } = this.state;
 
-    if (username.trim.length >= 3) {
+    if (username.trim().length >= 3) {
       Alert.alert(
         'Set username?',
-        `Set your username to "${username.trim}"?`,
+        `Set your username to "${username.trim()}"?`,
         [
           {text: 'Cancel', style: 'cancel'},
           {text: 'OK', onPress: () => {
-            this._setUsername(username.trim)
+            this._setUsername(username.trim())
           }},
         ],
         { cancelable: false }
@@ -84,6 +84,10 @@ class Start extends Component {
   _setUsername = async username => {
     try {
       await AsyncStorage.setItem('username', username);
+      this.setState({
+        loadedUsername: username
+      });
+      this._writeToDatabase(username);
     } catch (error) {
       Alert.alert(
         'An Error Occurred!',
@@ -92,8 +96,58 @@ class Start extends Component {
           {text: 'OK'},
         ],
         { cancelable: false }
-      )
+      );
     }
+  }
+
+  _setId = async id => {
+    try {
+      await AsyncStorage.setItem('id', id);
+      this._resetNavigation();
+    } catch (error) {
+      Alert.alert(
+        'An Error Occurred!',
+        'This is bad, please try again after restarting the app.',
+        [
+          {text: 'OK'},
+        ],
+        { cancelable: false }
+      );
+    }
+  }
+
+  _writeToDatabase = username => {
+    axios({
+      method: 'POST',
+      url: 'https://us-central1-dogal-220802.cloudfunctions.net/setUsername',
+      data: {
+        username
+      }
+    })
+      .then(res => {
+        if (res.status === 200) {
+          this._setId(res.data.id);
+        } else {
+          Alert.alert(
+            'An Error Occurred!',
+            'Please ensure you have an internet connection and try again!',
+            [
+              {text: 'OK'},
+            ],
+            { cancelable: false }
+          )
+        }
+      })
+      .catch(err => {
+        Alert.alert(
+          'An Error Occurred!',
+          err.message,
+          [
+            {text: 'OK'},
+          ],
+          { cancelable: false }
+        );
+      });
   }
 
   _resetNavigation = () => {
@@ -108,13 +162,13 @@ class Start extends Component {
   }
 
   render() {
-    const { username, loadedUsername } = this.state;
+    const { username, loadedUsername, loaded } = this.state;
 
     return (
       <KeyboardAvoidingView style={styles.container} behavior="padding">
-        {loadedUsername ? (
+        {loaded ? (
           <View>
-            {!username ? (
+            {!loadedUsername ? (
               <View>
                 <Text style={styles.title}>
                   Uh oh!
@@ -132,7 +186,7 @@ class Start extends Component {
             ) : (
               <View>
                 <Text style={styles.title}>
-                  Welcome back!
+                  Welcome!
                   {'\n'}
                   Please wait as we load your information!
                 </Text>
