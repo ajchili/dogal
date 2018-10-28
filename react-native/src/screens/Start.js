@@ -57,7 +57,7 @@ class Start extends Component {
   _validateUsername = () => {
     const { username } = this.state;
 
-    if (username.trim.length > 3) {
+    if (username.trim.length >= 3) {
       Alert.alert(
         'Set username?',
         `Set your username to "${username.trim}"?`,
