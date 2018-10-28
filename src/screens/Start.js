@@ -9,6 +9,7 @@ import {
   StyleSheet,
   View
 } from 'react-native';
+import { StackActions, NavigationActions } from 'react-navigation';
 
 class Start extends Component {
   static navigationOptions = {
@@ -29,12 +30,18 @@ class Start extends Component {
   }
 
   _loadUsername = async () => {
+    const { navigate } = this.props.navigation;
+
     try {
       const value = await AsyncStorage.getItem('username');
-      this.setState({
-        username: value || '',
-        loadedUsername: true
-      });
+
+      if (!!value) this._resetNavigation();
+      else {
+        this.setState({
+          username: value || '',
+          loadedUsername: true
+        });
+      }
     } catch (error) {
       Alert.alert(
         'An Error Occurred!',
@@ -50,14 +57,14 @@ class Start extends Component {
   _validateUsername = () => {
     const { username } = this.state;
 
-    if (username.length > 3) {
+    if (username.trim.length > 3) {
       Alert.alert(
         'Set username?',
-        `Set your username to "${username}"?`,
+        `Set your username to "${username.trim}"?`,
         [
           {text: 'Cancel', style: 'cancel'},
           {text: 'OK', onPress: () => {
-            this._setUsername(username)
+            this._setUsername(username.trim)
           }},
         ],
         { cancelable: false }
@@ -89,8 +96,18 @@ class Start extends Component {
     }
   }
 
+  _resetNavigation = () => {
+    const resetAction = StackActions.reset({
+      index: 0,
+      actions: [
+        NavigationActions.navigate({ routeName: 'Main' }),
+      ],
+    });
+    
+    this.props.navigation.dispatch(resetAction);
+  }
+
   render() {
-    const { navigate } = this.props.navigation;
     const { username, loadedUsername } = this.state;
 
     return (
