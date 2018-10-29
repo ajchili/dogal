@@ -14,6 +14,7 @@ import {
   View
 } from 'react-native';
 import axios from 'axios';
+import DogCard from '../components/DogCard';
 
 const { width } = Dimensions.get('window');
 
@@ -61,7 +62,7 @@ class Start extends Component {
       {
         name: 'Eric',
         food: {
-          morbreakfastning: false,
+          breakfast: false,
           lunch: false,
           dinner: false
         },
@@ -130,99 +131,63 @@ class Start extends Component {
       .catch(err => {});
   }
 
-  _renderDogCard = dog => {
-    return (
-      <View style={styles.dogCard}>
-        <Text style={styles.dogCardTitle}>{dog.name}</Text>
-        <Text style={styles.dogCardSubtitle}>Have I been fed?</Text>
-        <View style={styles.dogCardSliders}>
-          {this._renderDogCardFoodSwitch('Breakfast', dog.food.breakfast)}
-          {this._renderDogCardFoodSwitch('Lunch', dog.food.lunch)}
-          {this._renderDogCardFoodSwitch('Dinner', dog.food.dinner)}
-        </View>
-        <Text style={styles.dogCardSubtitle}>Have I gone potty?</Text>
-        <View style={styles.dogCardSliders}>
-          {this._renderDogCardPottySwitch('Morning', dog.potty.morning)}
-          {this._renderDogCardPottySwitch('Noon', dog.potty.noon)}
-          {this._renderDogCardPottySwitch('Night', dog.potty.night)}
-        </View>
-        <Text style={styles.dogCardSubtitle}>Have I gone on a walk?</Text>
-        <View style={styles.dogCardSliders}>
-          {this._renderDogCardWalkSwitch('Morning', dog.walk.morning)}
-          {this._renderDogCardWalkSwitch('Noon', dog.walk.noon)}
-          {this._renderDogCardWalkSwitch('Night', dog.walk.night)}
-        </View>
-      </View>
-    );
+  _handleUpdateFoodStatus = (dog, time, value) => {
+    // Copies array to prevent mutation of state.
+    let dogsCopy = JSON.parse(JSON.stringify(this.state.dogs));
+    dogsCopy[dog === 'Alaska' ? 0 : 1].food[time] = value;
+    this.setState({
+      dogs: dogsCopy
+    });
   }
 
-  _renderDogCardFoodSwitch = (time, checked) => {
-    return (
-      <View>
-        <Text>{time}</Text>
-        <Switch />
-      </View>
-    );
+  _handleUpdatePottyStatus = (dog, time, type, value) => {
+    // Copies array to prevent mutation of state.
+    let dogsCopy = JSON.parse(JSON.stringify(this.state.dogs));
+    dogsCopy[dog === 'Alaska' ? 0 : 1].potty[time][type] = value;
+    this.setState({
+      dogs: dogsCopy
+    });
   }
 
-  _renderDogCardPottySwitch = (time, potty) => {
-    return (
-      <View>
-        <Text>{time} - Pee</Text>
-        <Switch />
-        <Text>{time} - Poo</Text>
-        <Switch />
-      </View>
-    );
+  _handleUpdateWalkStatus = (dog, time, value) => {
+    // Copies array to prevent mutation of state.
+    let dogsCopy = JSON.parse(JSON.stringify(this.state.dogs));
+    dogsCopy[dog === 'Alaska' ? 0 : 1].walk[time] = value;
+    this.setState({
+      dogs: dogsCopy
+    });
   }
-
-  _renderDogCardWalkSwitch = (time, checked) => {
-    return (
-      <View>
-        <Text>{time}</Text>
-        <Switch />
-      </View>
-    );
-  }
-
-  _renderPlatformSpecificUI = () => {
+  
+  render() {
     const { users, dogs } = this.state;
 
-    if (Platform.OS === 'ios') {
-
-      return (
-        <SafeAreaView style={styles.container}>
-          <KeyboardAvoidingView behavior="padding">
-          {!users.length ? (
-            <ActivityIndicator />
-          ) : (
-            <FlatList
-              data={dogs}
-              renderItem={({item}) => this._renderDogCard(item)}
-              keyExtractor={(item) => item.name}/>
-          )}
-          </KeyboardAvoidingView>
-        </SafeAreaView>
-      );
-    } else {
-      return (
-        <KeyboardAvoidingView style={styles.container}
-                              behavior="padding">
+    let view = (
+      <KeyboardAvoidingView behavior="padding">
         {!users.length ? (
           <ActivityIndicator />
         ) : (
           <FlatList
             data={dogs}
-            renderItem={({item}) => this._renderDogCard(item)}
-            keyExtractor={(item) => item.name}/>
+            renderItem={({item}) => {
+              return(<DogCard dog={item}
+                              handleUpdateFoodStatus={this._handleUpdateFoodStatus}
+                              handleUpdatePottyStatus={this._handleUpdatePottyStatus}
+                              handleUpdateWalkStatus={this._handleUpdateWalkStatus} />)
+            }}
+            keyExtractor={item => item.name}/>
         )}
-        </KeyboardAvoidingView>
-      );
-    }
-  }
+      </KeyboardAvoidingView>
+    );
 
-  render() {
-    return this._renderPlatformSpecificUI();
+    if (Platform.OS === 'ios') {
+      return (
+        <SafeAreaView style={styles.container}>
+          {view}
+        </SafeAreaView>
+      );
+    } else {
+      return view;
+    }
   }
 }
 
