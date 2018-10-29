@@ -64,7 +64,7 @@ class Start extends Component {
         [
           {text: 'Cancel', style: 'cancel'},
           {text: 'OK', onPress: () => {
-            this._setUsername(username.trim())
+            this._setUsername(username.trim());
           }},
         ],
         { cancelable: false }
@@ -180,7 +180,7 @@ class Start extends Component {
                 <TextInput style={styles.username}
                           placeholder={'Username'}
                           onChangeText={username => this.setState({ username })}
-                          onSubmitEditing={() => this._validateUsername()}
+                          onSubmitEditing={this._validateUsername}
                           value={username} />
               </View>
             ) : (
