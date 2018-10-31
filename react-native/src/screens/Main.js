@@ -14,9 +14,12 @@ import {
   View
 } from 'react-native';
 import axios from 'axios';
+import { Realtime } from 'ably';
+import { ABLY_KEY } from 'react-native-dotenv';
 import DogCard from '../components/DogCard';
 
 const { width } = Dimensions.get('window');
+let ably, channel;
 
 class Start extends Component {
   static navigationOptions = {
@@ -25,6 +28,13 @@ class Start extends Component {
 
   constructor(props) {
     super(props);
+  }
+
+  componentWillMount() {
+  }
+
+  componentWillUnmount() {
+
   }
 
   state = {
@@ -102,6 +112,7 @@ class Start extends Component {
         username,
         id
       });
+      this._setupAbly(id);
     } catch (error) {
       Alert.alert(
         'An Error Occurred!',
@@ -112,6 +123,23 @@ class Start extends Component {
         { cancelable: false }
       )
     }
+  }
+
+  _setupAbly = id => {
+    ably = new Realtime({
+      key: ABLY_KEY,
+      clientId: id
+    });
+    channel = ably.channels.get('dog-status');
+    channel.attach(err => {
+      if (err) {
+        // TODO: Handle error
+      } else {
+        channel.subscribe(message => {
+          // TODO: Handle message
+        });
+      }
+    });
   }
 
   _loadUsers = () => {
