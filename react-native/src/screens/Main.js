@@ -20,6 +20,7 @@ import DogCard from '../components/DogCard';
 
 const { width } = Dimensions.get('window');
 let ably, channel;
+const day = 86400;
 
 class Start extends Component {
   static navigationOptions = {
@@ -28,13 +29,6 @@ class Start extends Component {
 
   constructor(props) {
     super(props);
-  }
-
-  componentWillMount() {
-  }
-
-  componentWillUnmount() {
-
   }
 
   state = {
@@ -121,7 +115,7 @@ class Start extends Component {
           {text: 'OK'},
         ],
         { cancelable: false }
-      )
+      );
     }
   }
 
@@ -133,10 +127,44 @@ class Start extends Component {
     channel = ably.channels.get('dog-status');
     channel.attach(err => {
       if (err) {
-        // TODO: Handle error
+        Alert.alert(
+          'Unable to Connect to Server',
+          'Please check your internet connection and re-start the app.',
+          [
+            {text: 'OK'},
+          ],
+          { cancelable: false }
+        )
       } else {
         channel.subscribe(message => {
-          // TODO: Handle message
+          if (message.clientId !== this.state.id) {
+            let data = message.data;
+            // Copies array to prevent mutation of state.
+            let dogsCopy = JSON.parse(JSON.stringify(this.state.dogs));
+            switch (message.name) {
+              case 'food-status':
+                dogsCopy[data.dog].food[data.time] = data.fed;
+                this.setState({
+                  dogs: dogsCopy
+                });
+                break;
+              case 'potty-status':
+                dogsCopy[data.dog].potty[data.time][data.type] = data.potty;
+                this.setState({
+                  dogs: dogsCopy
+                });
+                break;
+              case 'walk-status':
+              dogsCopy[data.dog].walk[data.time] = data.walk;
+              this.setState({
+                dogs: dogsCopy
+              });
+              break;
+              default:
+                console.log('Message type not supported:', message);
+                break;
+            }
+          }
         });
       }
     });
@@ -153,10 +181,26 @@ class Start extends Component {
             users: res.data
           });
         } else {
-
+          Alert.alert(
+            'Unable to Connect to Server',
+            'Please check your internet connection and re-start the app.',
+            [
+              {text: 'OK'},
+            ],
+            { cancelable: false }
+          )
         }
       })
-      .catch(err => {});
+      .catch(() => {
+        Alert.alert(
+          'Unable to Connect to Server',
+          'Please check your internet connection and re-start the app.',
+          [
+            {text: 'OK'},
+          ],
+          { cancelable: false }
+        )
+      });
   }
 
   _handleUpdateFoodStatus = (dog, time, value) => {
@@ -166,6 +210,13 @@ class Start extends Component {
     this.setState({
       dogs: dogsCopy
     });
+    if (channel) {
+      channel.publish('food-status', {
+        dog: dog === 'Alaska' ? 0 : 1,
+        time,
+        fed: value
+      });
+    }
   }
 
   _handleUpdatePottyStatus = (dog, time, type, value) => {
@@ -175,6 +226,14 @@ class Start extends Component {
     this.setState({
       dogs: dogsCopy
     });
+    if (channel) {
+      channel.publish('potty-status', {
+        dog: dog === 'Alaska' ? 0 : 1,
+        time,
+        type,
+        potty: value
+      });
+    }
   }
 
   _handleUpdateWalkStatus = (dog, time, value) => {
@@ -184,6 +243,13 @@ class Start extends Component {
     this.setState({
       dogs: dogsCopy
     });
+    if (channel) {
+      channel.publish('walk-status', {
+        dog: dog === 'Alaska' ? 0 : 1,
+        time,
+        walk: value
+      });
+    }
   }
   
   render() {
