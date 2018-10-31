@@ -14,6 +14,7 @@ import axios from 'axios';
 import { Realtime } from 'ably';
 import { ABLY_KEY } from 'react-native-dotenv';
 import DogCard from '../components/DogCard';
+import AblyHistory from '../ably/AblyHistory';
 
 const { width } = Dimensions.get('window');
 let ably, channel;
@@ -139,15 +140,50 @@ class Start extends Component {
         });
         if (Platform.OS === 'ios') {
           channel.history((err, resultPage) => {
+            if (err) {
+              console.error(err);
+              Alert.alert(
+                'Unable to Connect to Server',
+                'Please check your internet connection and re-start the app.',
+                [
+                  {text: 'OK'},
+                ],
+                { cancelable: false }
+              );
+            } else {
+              let today = new Date();
+              resultPage.items
+                .sort((a, b) => a.timestamp - b.timestamp)
+                .forEach(item => {
+                let date = new Date(item.timestamp);
+                if (today.getDate() === date.getDate()) {
+                  this._handleAblyMessage(item);
+                }
+              });
+            }
+          });
+        } else {
+          AblyHistory.get(ABLY_KEY, 'persisted:dog-status', err => {
+            console.error(err);
+            Alert.alert(
+              'Unable to Connect to Server',
+              'Please check your internet connection and re-start the app.',
+              [
+                {text: 'OK'},
+              ],
+              { cancelable: false }
+            );
+          }, history => {
             let today = new Date();
-            resultPage.items
-              .sort((a, b) => a.timestamp > b.timestamp)
+            let items = JSON.parse(history);
+            items
+              .sort((a, b) => a.timestamp - b.timestamp)
               .forEach(item => {
-              let date = new Date(item.timestamp);
-              if (today.getDate() === date.getDate()) {
-                this._handleAblyMessage(item);
-              }
-            });
+                let date = new Date(item.timestamp);
+                if (today.getDate() === date.getDate()) {
+                  this._handleAblyMessage(item);
+                }
+              });
           });
         }
       }
@@ -172,7 +208,7 @@ class Start extends Component {
               {text: 'OK'},
             ],
             { cancelable: false }
-          )
+          );
         }
       })
       .catch(() => {

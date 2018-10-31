@@ -1,4 +1,4 @@
-package com.dogal;
+package com.kirinpatel.dogal;
 
 import com.facebook.react.ReactActivity;
 
