@@ -8,10 +8,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
-  StyleSheet,
-  Switch,
-  Text,
-  View
+  StyleSheet
 } from 'react-native';
 import axios from 'axios';
 import { Realtime } from 'ably';
@@ -20,7 +17,6 @@ import DogCard from '../components/DogCard';
 
 const { width } = Dimensions.get('window');
 let ably, channel;
-const day = 86400;
 
 class Start extends Component {
   static navigationOptions = {
@@ -124,7 +120,7 @@ class Start extends Component {
       key: ABLY_KEY,
       clientId: id
     });
-    channel = ably.channels.get('dog-status');
+    channel = ably.channels.get('persisted:dog-status');
     channel.attach(err => {
       if (err) {
         Alert.alert(
@@ -138,34 +134,22 @@ class Start extends Component {
       } else {
         channel.subscribe(message => {
           if (message.clientId !== this.state.id) {
-            let data = message.data;
-            // Copies array to prevent mutation of state.
-            let dogsCopy = JSON.parse(JSON.stringify(this.state.dogs));
-            switch (message.name) {
-              case 'food-status':
-                dogsCopy[data.dog].food[data.time] = data.fed;
-                this.setState({
-                  dogs: dogsCopy
-                });
-                break;
-              case 'potty-status':
-                dogsCopy[data.dog].potty[data.time][data.type] = data.potty;
-                this.setState({
-                  dogs: dogsCopy
-                });
-                break;
-              case 'walk-status':
-              dogsCopy[data.dog].walk[data.time] = data.walk;
-              this.setState({
-                dogs: dogsCopy
-              });
-              break;
-              default:
-                console.log('Message type not supported:', message);
-                break;
-            }
+            this._handleAblyMessage(message);
           }
         });
+        if (Platform.OS === 'ios') {
+          channel.history((err, resultPage) => {
+            let today = new Date();
+            resultPage.items
+              .sort((a, b) => a.timestamp > b.timestamp)
+              .forEach(item => {
+              let date = new Date(item.timestamp);
+              if (today.getDate() === date.getDate()) {
+                this._handleAblyMessage(item);
+              }
+            });
+          });
+        }
       }
     });
   }
@@ -201,6 +185,35 @@ class Start extends Component {
           { cancelable: false }
         )
       });
+  }
+
+  _handleAblyMessage = message => {
+    let data = message.data;
+    // Copies array to prevent mutation of state.
+    let dogsCopy = JSON.parse(JSON.stringify(this.state.dogs));
+    switch (message.name) {
+      case 'food-status':
+        dogsCopy[data.dog].food[data.time] = data.fed;
+        this.setState({
+          dogs: dogsCopy
+        });
+        break;
+      case 'potty-status':
+        dogsCopy[data.dog].potty[data.time][data.type] = data.potty;
+        this.setState({
+          dogs: dogsCopy
+        });
+        break;
+      case 'walk-status':
+      dogsCopy[data.dog].walk[data.time] = data.walk;
+      this.setState({
+        dogs: dogsCopy
+      });
+      break;
+      default:
+        console.log('Message type not supported:', message);
+        break;
+    }
   }
 
   _handleUpdateFoodStatus = (dog, time, value) => {
