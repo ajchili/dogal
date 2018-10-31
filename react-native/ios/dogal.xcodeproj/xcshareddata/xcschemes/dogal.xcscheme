@@ -28,23 +28,23 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "dogal.app"
-               BlueprintName = "dogal"
-               ReferencedContainer = "container:dogal.xcodeproj">
+               BlueprintIdentifier = "58B511DA1A9E6C8500147676"
+               BuildableName = "libRCTLinking.a"
+               BlueprintName = "RCTLinking"
+               ReferencedContainer = "container:../node_modules/react-native/Libraries/LinkingIOS/RCTLinking.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
          <BuildActionEntry
             buildForTesting = "YES"
             buildForRunning = "YES"
-            buildForProfiling = "NO"
-            buildForArchiving = "NO"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "dogalTests.xctest"
-               BlueprintName = "dogalTests"
+               BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
+               BuildableName = "dogal.app"
+               BlueprintName = "dogal"
                ReferencedContainer = "container:dogal.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -56,16 +56,6 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
-         <TestableReference
-            skipped = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "dogalTests.xctest"
-               BlueprintName = "dogalTests"
-               ReferencedContainer = "container:dogal.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference
