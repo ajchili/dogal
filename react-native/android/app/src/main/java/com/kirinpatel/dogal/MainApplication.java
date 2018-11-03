@@ -9,6 +9,7 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import com.kirinpatel.ablyHistory.AblyHistoryPackage;
+import iyegoroff.RNColorMatrixImageFilters.RNColorMatrixImageFiltersPackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -25,7 +26,8 @@ public class MainApplication extends Application implements ReactApplication {
         protected List<ReactPackage> getPackages() {
             return Arrays.asList(
                     new MainReactPackage(),
-                    new AblyHistoryPackage()
+                    new AblyHistoryPackage(),
+                    new RNColorMatrixImageFiltersPackage()
             );
         }
 

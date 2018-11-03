@@ -12,6 +12,7 @@
     "axios": "^0.18.0",
     "react": "16.6.0-alpha.8af6728",
     "react-native": "0.57.4",
+    "react-native-color-matrix-image-filters": "^4.0.0",
     "react-navigation": "^2.18.2"
   },
   "devDependencies": {
