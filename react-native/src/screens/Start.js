@@ -4,6 +4,7 @@ import {
   Alert,
   AsyncStorage,
   KeyboardAvoidingView,
+  Image,
   Text,
   TextInput,
   StyleSheet,
@@ -11,12 +12,9 @@ import {
 } from 'react-native';
 import { StackActions, NavigationActions } from 'react-navigation';
 import axios from 'axios';
+import Trust from "../assets/icons8-trust.png";
 
 class Start extends Component {
-  static navigationOptions = {
-    title: 'Welcome',
-  };
-
   constructor(props) {
     super(props);
   }
@@ -69,7 +67,7 @@ class Start extends Component {
         ],
         { cancelable: false }
       )
-    } else {
+    } else if (username.trim().length) {
       Alert.alert(
         'Inavlid username!',
         'Your username must be at least three characters long!',
@@ -165,33 +163,30 @@ class Start extends Component {
     const { username, loadedUsername, loaded } = this.state;
 
     return (
-      <KeyboardAvoidingView style={styles.container} behavior="padding">
+      <KeyboardAvoidingView style={styles.container}
+                            behavior="padding">
         {loaded ? (
           <View>
             {!loadedUsername ? (
               <View>
+                <View style={styles.imageContainer}>
+                  <Image source={Trust}
+                         style={styles.image} blurRadius={.2} />
+                </View>
                 <Text style={styles.title}>
-                  Uh oh!
-                  {'\n'}
-                  Looks like you haven't set your username!
-                  {'\n\n\n'}
-                  Let's change that!
+                  Let's get started
+                </Text>
+                <Text style={styles.subTitle}>
+                  and keep track of your dogs with your family
                 </Text>
                 <TextInput style={styles.username}
-                          placeholder={'Username'}
-                          onChangeText={username => this.setState({ username })}
-                          onSubmitEditing={this._validateUsername}
-                          value={username} />
+                           placeholder={'Username'}
+                           onChangeText={username => this.setState({ username })}
+                           onSubmitEditing={this._validateUsername}
+                           value={username} />
               </View>
             ) : (
-              <View>
-                <Text style={styles.title}>
-                  Welcome!
-                  {'\n'}
-                  Please wait as we load your information!
-                </Text>
-                <ActivityIndicator/>
-              </View>
+              <ActivityIndicator/>
             )}
           </View>
         ) : ( 
@@ -202,19 +197,46 @@ class Start extends Component {
   }
 }
 
+const imageSize = 175;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center'
   },
+  imageContainer: {
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  image: {
+    width: imageSize,
+    height: imageSize,
+  },
   title: {
-    padding: 20,
-    fontSize: 20,
+    paddingTop: 30,
+    paddingBottom: 4,
+    paddingLeft: 30,
+    paddingRight: 30,
+    fontSize: 28,
+    textAlign: 'center'
+  },
+  subTitle: {
+    paddingBottom: 30,
+    paddingLeft: 30,
+    paddingRight: 30,
+    fontSize: 25,
     textAlign: 'center'
   },
   username: {
-    padding: 20
+    padding: 20,
+    marginLeft: 30,
+    marginRight: 30,
+    fontSize: 20,
+    backgroundColor: '#eeeeee',
+    borderRadius: 6
   }
 });
 

@@ -5,6 +5,8 @@ import Main from './src/screens/Main';
 const App = createStackNavigator({
   Start: { screen: Start },
   Main: { screen: Main}
+}, {
+  headerMode: 'none'
 });
 
 export default App;
