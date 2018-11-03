@@ -165,30 +165,25 @@ class Start extends Component {
     return (
       <KeyboardAvoidingView style={styles.container}
                             behavior="padding">
-        {loaded ? (
-          <View>
-            {!loadedUsername ? (
-              <View>
-                <View style={styles.imageContainer}>
-                  <Image source={Trust}
-                         style={styles.image} blurRadius={.2} />
-                </View>
-                <Text style={styles.title}>
-                  Let's get started
-                </Text>
-                <Text style={styles.subTitle}>
-                  and keep track of your dogs with your family
-                </Text>
-                <TextInput style={styles.username}
-                           placeholder={'Username'}
-                           onChangeText={username => this.setState({ username })}
-                           onSubmitEditing={this._validateUsername}
-                           value={username} />
+        {loaded && !loadedUsername ? (
+            <View>
+              <View style={styles.imageContainer}>
+                <Image source={Trust}
+                       style={styles.image}
+                       blurRadius={.2} />
               </View>
-            ) : (
-              <ActivityIndicator/>
-            )}
-          </View>
+              <Text style={styles.title}>
+                Let's get started
+              </Text>
+              <Text style={styles.subTitle}>
+                and keep track of your dogs with your family
+              </Text>
+              <TextInput style={styles.username}
+                         placeholder={'Username'}
+                         onChangeText={username => this.setState({ username })}
+                         onSubmitEditing={this._validateUsername}
+                         value={username} />
+            </View>
         ) : ( 
           <ActivityIndicator/>
         )}
@@ -213,7 +208,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: imageSize,
-    height: imageSize,
+    height: imageSize
   },
   title: {
     paddingTop: 30,
