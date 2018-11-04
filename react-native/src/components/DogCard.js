@@ -44,12 +44,12 @@ class DogCard extends Component {
         <Toggle source={pee}
                 selected={peeSelected}
                 onPress={() => {
-                  this.props.handleUpdateFoodStatus(dog.name, time.toLowerCase(), !peeSelected);
+                  this.props.handleUpdatePottyStatus(dog.name, time.toLowerCase(), 'pee', !peeSelected);
                 }}/>
         <Toggle source={poo}
                 selected={pooSelected}
                 onPress={() => {
-                  this.props.handleUpdateFoodStatus(dog.name, time.toLowerCase(), !pooSelected);
+                  this.props.handleUpdatePottyStatus(dog.name, time.toLowerCase(), 'poo', !pooSelected);
                 }}/>
       </View>
     );
@@ -63,7 +63,7 @@ class DogCard extends Component {
       <Toggle source={walk}
               selected={selected}
               onPress={() => {
-                this.props.handleUpdateFoodStatus(dog.name, time.toLowerCase(), !selected);
+                this.props.handleUpdateWalkStatus(dog.name, time.toLowerCase(), !selected);
               }}/>
     );
   }
