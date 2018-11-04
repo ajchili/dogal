@@ -2,10 +2,16 @@ import React, { Component } from 'react';
 import {
   Dimensions,
   StyleSheet,
-  Switch,
   Text,
   View
 } from 'react-native';
+import Toggle from '../components/Toggle';
+import breakfast from '../assets/icons8-pancake.png';
+import lunch from '../assets/icons8-street-food.png';
+import dinner from '../assets/icons8-thanksgiving.png';
+import pee from '../assets/icons8-city-fire-hydrant.png';
+import poo from '../assets/icons8-barbecue-sausages.png';
+import walk from '../assets/icons8-trainers.png';
 
 const { width } = Dimensions.get('window');
 
@@ -16,49 +22,49 @@ class DogCard extends Component {
 
   _renderDogCardFoodSwitch = time => {
     const { dog } = this.props;
-    let checked = dog.food[time.toLowerCase()];
+    let selected = dog.food[time.toLowerCase()];
+    let source = time.toLowerCase() === 'breakfast' ? breakfast :  time.toLowerCase() === 'lunch' ? lunch : dinner;
 
     return (
-      <View>
-        <Text>{time}</Text>
-        <Switch onValueChange={value => {
-                  this.props.handleUpdateFoodStatus(dog.name, time.toLowerCase(), value);
-                }}
-                value={checked} />
-      </View>
+      <Toggle source={source}
+              selected={selected}
+              onPress={() => {
+                this.props.handleUpdateFoodStatus(dog.name, time.toLowerCase(), !selected);
+              }}/>
     );
   }
 
   _renderDogCardPottySwitch = time => {
     const { dog } = this.props;
+    let peeSelected = dog.potty[time.toLowerCase()].pee;
+    let pooSelected = dog.potty[time.toLowerCase()].poo;
 
     return (
       <View>
-        <Text>{time} - Pee</Text>
-        <Switch onValueChange={value => {
-                  this.props.handleUpdatePottyStatus(dog.name, time.toLowerCase(), 'pee', value);
-                }}
-                value={dog.potty[time.toLowerCase()].pee} />
-        <Text>{time} - Poo</Text>
-        <Switch onValueChange={value => {
-                  this.props.handleUpdatePottyStatus(dog.name, time.toLowerCase(), 'poo', value);
-                }}
-                value={dog.potty[time.toLowerCase()].poo} />
+        <Toggle source={pee}
+                selected={peeSelected}
+                onPress={() => {
+                  this.props.handleUpdateFoodStatus(dog.name, time.toLowerCase(), !peeSelected);
+                }}/>
+        <Toggle source={poo}
+                selected={pooSelected}
+                onPress={() => {
+                  this.props.handleUpdateFoodStatus(dog.name, time.toLowerCase(), !pooSelected);
+                }}/>
       </View>
     );
   }
 
   _renderDogCardWalkSwitch = time => {
     const { dog } = this.props;
+    let selected = dog.walk[time.toLowerCase()];
 
     return (
-      <View>
-        <Text>{time}</Text>
-        <Switch onValueChange={value => {
-                  this.props.handleUpdateWalkStatus(dog.name, time.toLowerCase(), value);
-                }}
-                value={dog.walk[time.toLowerCase()]} />
-      </View>
+      <Toggle source={walk}
+              selected={selected}
+              onPress={() => {
+                this.props.handleUpdateFoodStatus(dog.name, time.toLowerCase(), !selected);
+              }}/>
     );
   }
 
