@@ -43,7 +43,7 @@ class Start extends Component {
     } catch (error) {
       Alert.alert(
         'An Error Occurred!',
-        'This is bad, please try again after restarting the app.',
+        'Oops, please try again after restarting the app.',
         [
           {text: 'OK'},
         ],
@@ -69,7 +69,7 @@ class Start extends Component {
       )
     } else if (username.trim().length) {
       Alert.alert(
-        'Inavlid username!',
+        'Invalid username!',
         'Your username must be at least three characters long!',
         [
           {text: 'OK'},
@@ -89,7 +89,7 @@ class Start extends Component {
     } catch (error) {
       Alert.alert(
         'An Error Occurred!',
-        'This is bad, please try again after restarting the app.',
+        'Oops, please try again after restarting the app.',
         [
           {text: 'OK'},
         ],
@@ -105,7 +105,7 @@ class Start extends Component {
     } catch (error) {
       Alert.alert(
         'An Error Occurred!',
-        'This is bad, please try again after restarting the app.',
+        'Oops, please try again after restarting the app.',
         [
           {text: 'OK'},
         ],
