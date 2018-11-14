@@ -15,6 +15,10 @@ import axios from 'axios';
 import Trust from "../assets/icons8-trust.png";
 
 class Start extends Component {
+  static navigationOptions = {
+    header: null
+  };
+
   constructor(props) {
     super(props);
   }

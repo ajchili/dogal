@@ -20,6 +20,10 @@ const { width } = Dimensions.get('window');
 let ably, channel;
 
 class Start extends Component {
+  static navigationOptions = {
+    title: 'Dogal'
+  };
+
   constructor(props) {
     super(props);
   }
