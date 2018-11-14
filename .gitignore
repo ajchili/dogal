@@ -4,3 +4,4 @@ node_modules/
 *.apk
 third-party/
 output.json
+.idea/
