@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import {
   Alert,
   AsyncStorage,
@@ -10,24 +10,21 @@ import {
   StyleSheet
 } from 'react-native';
 import axios from 'axios';
-import { Realtime } from 'ably';
-import { ABLY_KEY } from 'react-native-dotenv';
+import {Realtime} from 'ably';
+import {ABLY_KEY} from 'react-native-dotenv';
 import {
   DogCard,
   LoadingIndicator
 } from '../components';
+import {User} from '../dogal';
 
-const { width } = Dimensions.get('window');
+const {width} = Dimensions.get('window');
 let ably, channel;
 
 class Start extends Component {
   static navigationOptions = {
-    title: 'Dogal'
+    title: 'Your Family'
   };
-
-  constructor(props) {
-    super(props);
-  }
 
   state = {
     username: null,
@@ -96,26 +93,28 @@ class Start extends Component {
     this._loadUsers();
   }
 
-  _loadUserData = async () => {
-    try {
-      const username = await AsyncStorage.getItem('username');
-      const id = await AsyncStorage.getItem('id');
-      this.setState({
-        username,
-        id
-      });
-      this._setupAbly(id);
-    } catch (error) {
-      Alert.alert(
-        'An Error Occurred!',
-        'This is bad, please try again after restarting the app.',
-        [
-          {text: 'OK'},
-        ],
-        { cancelable: false }
-      );
-    }
-  }
+  _loadUserData = () => {
+    User.getId()
+      .then(id => {
+        this.setState({id});
+        this._setupAbly(id);
+      })
+      .catch(() => this._displayError());
+    User.getUsername()
+      .then(username => this.setState({username}))
+      .catch(() => this._displayError());
+  };
+
+  _displayError = () => {
+    Alert.alert(
+      'An Error Occurred!',
+      'This is bad, please try again after restarting the app.',
+      [
+        {text: 'OK'},
+      ],
+      {cancelable: false}
+    );
+  };
 
   _setupAbly = id => {
     ably = new Realtime({
@@ -131,7 +130,7 @@ class Start extends Component {
           [
             {text: 'OK'},
           ],
-          { cancelable: false }
+          {cancelable: false}
         )
       } else {
         channel.subscribe(message => {
@@ -149,18 +148,18 @@ class Start extends Component {
                 [
                   {text: 'OK'},
                 ],
-                { cancelable: false }
+                {cancelable: false}
               );
             } else {
               let today = new Date();
               resultPage.items
                 .sort((a, b) => a.timestamp - b.timestamp)
                 .forEach(item => {
-                let date = new Date(item.timestamp);
-                if (today.getDate() === date.getDate()) {
-                  this._handleAblyMessage(item);
-                }
-              });
+                  let date = new Date(item.timestamp);
+                  if (today.getDate() === date.getDate()) {
+                    this._handleAblyMessage(item);
+                  }
+                });
             }
           });
         } else {
@@ -172,7 +171,7 @@ class Start extends Component {
               [
                 {text: 'OK'},
               ],
-              { cancelable: false }
+              {cancelable: false}
             );
           }, history => {
             let today = new Date();
@@ -189,7 +188,7 @@ class Start extends Component {
         }
       }
     });
-  }
+  };
 
   _loadUsers = () => {
     axios({
@@ -208,7 +207,7 @@ class Start extends Component {
             [
               {text: 'OK'},
             ],
-            { cancelable: false }
+            {cancelable: false}
           );
         }
       })
@@ -219,10 +218,10 @@ class Start extends Component {
           [
             {text: 'OK'},
           ],
-          { cancelable: false }
+          {cancelable: false}
         )
       });
-  }
+  };
 
   _handleAblyMessage = message => {
     let data = message.data;
@@ -242,16 +241,16 @@ class Start extends Component {
         });
         break;
       case 'walk-status':
-      dogsCopy[data.dog].walk[data.time] = data.walk;
-      this.setState({
-        dogs: dogsCopy
-      });
-      break;
+        dogsCopy[data.dog].walk[data.time] = data.walk;
+        this.setState({
+          dogs: dogsCopy
+        });
+        break;
       default:
         console.log('Message type not supported:', message);
         break;
     }
-  }
+  };
 
   _handleUpdateFoodStatus = (dog, time, value) => {
     // Copies array to prevent mutation of state.
@@ -267,7 +266,7 @@ class Start extends Component {
         fed: value
       });
     }
-  }
+  };
 
   _handleUpdatePottyStatus = (dog, time, type, value) => {
     // Copies array to prevent mutation of state.
@@ -284,7 +283,7 @@ class Start extends Component {
         potty: value
       });
     }
-  }
+  };
 
   _handleUpdateWalkStatus = (dog, time, value) => {
     // Copies array to prevent mutation of state.
@@ -300,23 +299,23 @@ class Start extends Component {
         walk: value
       });
     }
-  }
-  
+  };
+
   render() {
-    const { users, dogs } = this.state;
+    const {users, dogs} = this.state;
 
     let view = (
       <KeyboardAvoidingView behavior="padding">
         {!users.length ? (
-          <LoadingIndicator />
+          <LoadingIndicator/>
         ) : (
           <FlatList
             data={dogs}
             renderItem={({item}) => {
-              return(<DogCard dog={item}
-                              handleUpdateFoodStatus={this._handleUpdateFoodStatus}
-                              handleUpdatePottyStatus={this._handleUpdatePottyStatus}
-                              handleUpdateWalkStatus={this._handleUpdateWalkStatus} />)
+              return (<DogCard dog={item}
+                               handleUpdateFoodStatus={this._handleUpdateFoodStatus}
+                               handleUpdatePottyStatus={this._handleUpdatePottyStatus}
+                               handleUpdateWalkStatus={this._handleUpdateWalkStatus}/>)
             }}
             keyExtractor={item => item.name}/>
         )}
@@ -330,7 +329,11 @@ class Start extends Component {
         </SafeAreaView>
       );
     } else {
-      return view;
+      return (
+        <View style={styles.container}>
+          {view}
+        </View>
+      );
     }
   }
 }
