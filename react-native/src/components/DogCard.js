@@ -5,25 +5,23 @@ import {
   Text,
   View
 } from 'react-native';
-import { Toggle } from './';
-import breakfast from '../assets/icons8-pancake.png';
-import lunch from '../assets/icons8-street-food.png';
-import dinner from '../assets/icons8-thanksgiving.png';
-import pee from '../assets/icons8-city-fire-hydrant.png';
-import poo from '../assets/icons8-barbecue-sausages.png';
-import walk from '../assets/icons8-trainers.png';
+import Toggle from './Toggle';
+import {
+  FireHydrant,
+  Hamburger,
+  Pancake,
+  Poop,
+  Spaghetti,
+  Walking
+} from '../assets/images';
 
 const { width } = Dimensions.get('window');
 
 class DogCard extends Component {
-  constructor(props) {
-    super(props);
-  }
-
   _renderDogCardFoodSwitch = time => {
     const { dog } = this.props;
     let selected = dog.food[time.toLowerCase()];
-    let source = time.toLowerCase() === 'breakfast' ? breakfast :  time.toLowerCase() === 'lunch' ? lunch : dinner;
+    let source = time.toLowerCase() === 'breakfast' ? Pancake :  time.toLowerCase() === 'lunch' ? Hamburger : Spaghetti;
 
     return (
       <Toggle source={source}
@@ -32,7 +30,7 @@ class DogCard extends Component {
                 this.props.handleUpdateFoodStatus(dog.name, time.toLowerCase(), !selected);
               }}/>
     );
-  }
+  };
 
   _renderDogCardPottySwitch = time => {
     const { dog } = this.props;
@@ -41,32 +39,32 @@ class DogCard extends Component {
 
     return (
       <View>
-        <Toggle source={pee}
+        <Toggle source={FireHydrant}
                 selected={peeSelected}
                 onPress={() => {
                   this.props.handleUpdatePottyStatus(dog.name, time.toLowerCase(), 'pee', !peeSelected);
                 }}/>
-        <Toggle source={poo}
+        <Toggle source={Poop}
                 selected={pooSelected}
                 onPress={() => {
                   this.props.handleUpdatePottyStatus(dog.name, time.toLowerCase(), 'poo', !pooSelected);
                 }}/>
       </View>
     );
-  }
+  };
 
   _renderDogCardWalkSwitch = time => {
     const { dog } = this.props;
     let selected = dog.walk[time.toLowerCase()];
 
     return (
-      <Toggle source={walk}
+      <Toggle source={Walking}
               selected={selected}
               onPress={() => {
                 this.props.handleUpdateWalkStatus(dog.name, time.toLowerCase(), !selected);
               }}/>
     );
-  }
+  };
 
   render() {
     const { dog } = this.props;

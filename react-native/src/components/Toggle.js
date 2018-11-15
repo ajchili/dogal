@@ -6,18 +6,22 @@ import {
 import { Grayscale } from 'react-native-color-matrix-image-filters';
 
 class Toggle extends Component {
-  constructor(props) {
-    super(props);
-  }
-
   render() {
     return (
       <TouchableOpacity onPress={this.props.onPress}>
         {this.props.selected === true ? (
-          <Image source={this.props.source} />
+          <Image source={this.props.source}
+                 style={{
+                   width: 64,
+                   height: 64
+                 }} />
         ) : (
           <Grayscale>
-            <Image source={this.props.source} />
+            <Image source={this.props.source}
+                   style={{
+                     width: 64,
+                     height: 64
+                   }} />
           </Grayscale>
         )}
       </TouchableOpacity>
