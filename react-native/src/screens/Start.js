@@ -13,6 +13,7 @@ import { StackActions, NavigationActions } from 'react-navigation';
 import axios from 'axios';
 import { Family } from '../assets/images';
 import { LoadingIndicator } from '../components';
+import { RandomQuoteGenerator } from '../dogal';
 
 class Start extends Component {
   static navigationOptions = {
@@ -184,7 +185,12 @@ class Start extends Component {
                          value={username} />
             </View>
         ) : (
-          <LoadingIndicator />
+          <View style={styles.loadingContainer}>
+            <Text style={styles.subTitle}>
+              {RandomQuoteGenerator.generate().toLowerCase()}
+            </Text>
+            <LoadingIndicator />
+          </View>
         )}
       </KeyboardAvoidingView>
     );
@@ -201,6 +207,11 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   imageContainer: {
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  loadingContainer: {
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center'
