@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import {
   Alert,
   AsyncStorage,
@@ -9,11 +9,13 @@ import {
   StyleSheet,
   View
 } from 'react-native';
-import { StackActions, NavigationActions } from 'react-navigation';
-import axios from 'axios';
-import { Family } from '../assets/images';
-import { LoadingIndicator } from '../components';
-import { RandomQuoteGenerator } from '../dogal';
+import {StackActions, NavigationActions} from 'react-navigation';
+import {Family} from '../assets/images';
+import {LoadingIndicator} from '../components';
+import {
+  RandomQuoteGenerator,
+  User
+} from '../dogal';
 
 class Start extends Component {
   static navigationOptions = {
@@ -27,34 +29,34 @@ class Start extends Component {
   };
 
   componentWillMount() {
-    this._loadUsername();
+    this._load();
   }
 
-  _loadUsername = async () => {
-    try {
-      const value = await AsyncStorage.getItem('username');
-
-      if (!!value) this._resetNavigation();
-      else {
-        this.setState({
-          loadedUsername: value || '',
-          loaded: true
-        });
-      }
-    } catch (error) {
-      Alert.alert(
-        'An Error Occurred!',
-        'Oops, please try again after restarting the app.',
-        [
-          {text: 'OK'},
-        ],
-        { cancelable: false }
-      )
-    }
-  }
+  _load = () => {
+    User.getUsername()
+      .then(username => {
+        if (!!username) this._resetNavigation();
+        else {
+          this.setState({
+            loadedUsername: username || '',
+            loaded: true
+          });
+        }
+      })
+      .catch(() => {
+        Alert.alert(
+          'An Error Occurred!',
+          'Oops, please try again after restarting the app.',
+          [
+            {text: 'OK'},
+          ],
+          {cancelable: false}
+        )
+      });
+  };
 
   _validateUsername = () => {
-    const { username } = this.state;
+    const {username} = this.state;
 
     if (username.trim().length >= 3) {
       Alert.alert(
@@ -62,11 +64,13 @@ class Start extends Component {
         `Set your username to "${username.trim()}"?`,
         [
           {text: 'Cancel', style: 'cancel'},
-          {text: 'OK', onPress: () => {
-            this._setUsername(username.trim());
-          }},
+          {
+            text: 'OK', onPress: () => {
+              User.setUsername(username.trim());
+            }
+          },
         ],
-        { cancelable: false }
+        {cancelable: false}
       )
     } else if (username.trim().length) {
       Alert.alert(
@@ -75,121 +79,52 @@ class Start extends Component {
         [
           {text: 'OK'},
         ],
-        { cancelable: false }
+        {cancelable: false}
       )
     }
-  }
-
-  _setUsername = async username => {
-    try {
-      await AsyncStorage.setItem('username', username);
-      this.setState({
-        loadedUsername: username
-      });
-      this._writeToDatabase(username);
-    } catch (error) {
-      Alert.alert(
-        'An Error Occurred!',
-        'Oops, please try again after restarting the app.',
-        [
-          {text: 'OK'},
-        ],
-        { cancelable: false }
-      );
-    }
-  }
-
-  _setId = async id => {
-    try {
-      await AsyncStorage.setItem('id', id);
-      this._resetNavigation();
-    } catch (error) {
-      Alert.alert(
-        'An Error Occurred!',
-        'Oops, please try again after restarting the app.',
-        [
-          {text: 'OK'},
-        ],
-        { cancelable: false }
-      );
-    }
-  }
-
-  _writeToDatabase = username => {
-    axios({
-      method: 'POST',
-      url: 'https://us-central1-dogal-220802.cloudfunctions.net/setUsername',
-      data: {
-        username
-      }
-    })
-      .then(res => {
-        if (res.status === 200) {
-          this._setId(res.data.id);
-        } else {
-          Alert.alert(
-            'An Error Occurred!',
-            'Please ensure you have an internet connection and try again!',
-            [
-              {text: 'OK'},
-            ],
-            { cancelable: false }
-          )
-        }
-      })
-      .catch(err => {
-        Alert.alert(
-          'An Error Occurred!',
-          err.message,
-          [
-            {text: 'OK'},
-          ],
-          { cancelable: false }
-        );
-      });
-  }
+  };
 
   _resetNavigation = () => {
     const resetAction = StackActions.reset({
       index: 0,
       actions: [
-        NavigationActions.navigate({ routeName: 'Main' }),
+        NavigationActions.navigate({routeName: 'Main'}),
       ],
     });
-    
+
     this.props.navigation.dispatch(resetAction);
-  }
+  };
 
   render() {
-    const { username, loadedUsername, loaded } = this.state;
+    const {username, loadedUsername, loaded} = this.state;
 
     return (
       <KeyboardAvoidingView style={styles.container}
                             behavior="padding">
         {loaded && !loadedUsername ? (
-            <View>
-              <View style={styles.imageContainer}>
-                <Image source={Family}
-                       style={styles.image} />
-              </View>
-              <Text style={styles.title}>
-                Let's get started
-              </Text>
-              <Text style={styles.subTitle}>
-                and keep track of your dogs with your family
-              </Text>
-              <TextInput style={styles.username}
-                         placeholder={'Username'}
-                         onChangeText={username => this.setState({ username })}
-                         onSubmitEditing={this._validateUsername}
-                         value={username} />
+          <View>
+            <View style={styles.imageContainer}>
+              <Image source={Family}
+                     style={styles.image}/>
             </View>
+            <Text style={styles.title}>
+              Let's get started
+            </Text>
+            <Text style={styles.subTitle}>
+              and keep track of your dogs with your family
+            </Text>
+            <TextInput style={styles.username}
+                       placeholder={'Username'}
+                       onChangeText={username => this.setState({username})}
+                       onSubmitEditing={this._validateUsername}
+                       value={username}/>
+          </View>
         ) : (
           <View style={styles.loadingContainer}>
             <Text style={styles.subTitle}>
               {RandomQuoteGenerator.generate().toLowerCase()}
             </Text>
-            <LoadingIndicator />
+            <LoadingIndicator/>
           </View>
         )}
       </KeyboardAvoidingView>
