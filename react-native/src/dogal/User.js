@@ -46,8 +46,17 @@ module.exports = {
             username
           }
         })
-          .then(res => {
-            if (res.status === 200) return this.setId(res.data.id);
+          .then(async res => {
+            if (res.status === 200) {
+              try {
+                await AsyncStorage.setItem('username', username);
+                module.exports.setId(res.data.id)
+                  .then(() => resolve())
+                  .catch(err => reject(err));
+              } catch (err) {
+                reject(err);
+              }
+            }
             else reject(res.data);
           })
           .catch(err => reject(err));

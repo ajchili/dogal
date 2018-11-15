@@ -43,16 +43,7 @@ class Start extends Component {
           });
         }
       })
-      .catch(() => {
-        Alert.alert(
-          'An Error Occurred!',
-          'Oops, please try again after restarting the app.',
-          [
-            {text: 'OK'},
-          ],
-          {cancelable: false}
-        )
-      });
+      .catch(() => this._displayError());
   };
 
   _validateUsername = () => {
@@ -66,7 +57,12 @@ class Start extends Component {
           {text: 'Cancel', style: 'cancel'},
           {
             text: 'OK', onPress: () => {
-              User.setUsername(username.trim());
+              User.setUsername(username.trim())
+                .then(() => this._resetNavigation())
+                .catch(err => {
+                  console.error(err);
+                  this._displayError()
+                });
             }
           },
         ],
@@ -93,6 +89,17 @@ class Start extends Component {
     });
 
     this.props.navigation.dispatch(resetAction);
+  };
+
+  _displayError = () => {
+    Alert.alert(
+      'An Error Occurred!',
+      'Oops, please try again after restarting the app.',
+      [
+        {text: 'OK'},
+      ],
+      {cancelable: false}
+    );
   };
 
   render() {
