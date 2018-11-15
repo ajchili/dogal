@@ -19,10 +19,6 @@ class Start extends Component {
     header: null
   };
 
-  constructor(props) {
-    super(props);
-  }
-
   state = {
     username: '',
     loadedUsername: '',

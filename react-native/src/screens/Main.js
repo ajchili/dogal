@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import {
-  ActivityIndicator,
   Alert,
   AsyncStorage,
   Dimensions,
@@ -13,7 +12,10 @@ import {
 import axios from 'axios';
 import { Realtime } from 'ably';
 import { ABLY_KEY } from 'react-native-dotenv';
-import { DogCard } from '../components';
+import {
+  DogCard,
+  LoadingIndicator
+} from '../components';
 
 const { width } = Dimensions.get('window');
 let ably, channel;
@@ -306,7 +308,7 @@ class Start extends Component {
     let view = (
       <KeyboardAvoidingView behavior="padding">
         {!users.length ? (
-          <ActivityIndicator />
+          <LoadingIndicator />
         ) : (
           <FlatList
             data={dogs}
