@@ -13,11 +13,10 @@ exports.setUsername = (req, res) => {
       res.status(403).send('Username must be at least 3 characters long!');
     } else {
       const datastore = new Datastore({ projectId });
-      let id = req.body.id;
 
-      if (id) {
+      if (req.body.id) {
         const transaction = datastore.transaction();
-        const userKey = datastore.key(['User', id]);
+        const userKey = datastore.key(['Users', parseInt(req.body.id)]);
 
         transaction
           .run()
@@ -31,10 +30,9 @@ exports.setUsername = (req, res) => {
             });
             return transaction.commit();
           })
-          .then(() => res.status(200).send)
+          .then(() => res.status(200).send())
           .catch(() => {
-            transaction.rollback();
-            res.status(500).send();
+            transaction.rollback(() => res.status(500).send());
           });
       } else {
         const kind = 'Users';
