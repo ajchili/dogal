@@ -10,6 +10,7 @@
     "ably": "^1.0.18",
     "ably-react-native": "^1.0.0",
     "axios": "^0.18.0",
+    "prop-types": "^15.6.2",
     "react": "16.6.0-alpha.8af6728",
     "react-native": "0.57.4",
     "react-native-color-matrix-image-filters": "^4.0.0",

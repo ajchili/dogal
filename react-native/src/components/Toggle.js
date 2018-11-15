@@ -3,6 +3,7 @@ import {
   Image,
   TouchableOpacity,
 } from 'react-native';
+import PropTypes from 'prop-types';
 import { Grayscale } from 'react-native-color-matrix-image-filters';
 
 class Toggle extends Component {
@@ -28,5 +29,11 @@ class Toggle extends Component {
     );
   }
 }
+
+Toggle.propTypes= {
+  onPress: PropTypes.func,
+  selected: PropTypes.bool.isRequired,
+  source: PropTypes.object.isRequired
+};
 
 export default Toggle;
