@@ -13,8 +13,7 @@ import {
 import axios from 'axios';
 import { Realtime } from 'ably';
 import { ABLY_KEY } from 'react-native-dotenv';
-import DogCard from '../components/DogCard';
-import AblyHistory from '../ably/AblyHistory';
+import { DogCard } from '../components';
 
 const { width } = Dimensions.get('window');
 let ably, channel;

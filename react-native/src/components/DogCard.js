@@ -5,7 +5,7 @@ import {
   Text,
   View
 } from 'react-native';
-import Toggle from '../components/Toggle';
+import { Toggle } from './';
 import breakfast from '../assets/icons8-pancake.png';
 import lunch from '../assets/icons8-street-food.png';
 import dinner from '../assets/icons8-thanksgiving.png';
