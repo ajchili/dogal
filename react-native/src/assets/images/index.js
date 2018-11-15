@@ -1,3 +1,5 @@
+import Corgi from './icons8-corgi.png';
+import Dog from './icons8-dog.png';
 import Family from './icons8-family.png';
 import FireHydrant from './icons8-fire-hydrant.png';
 import Hamburger from './icons8-hamburger.png';
@@ -11,6 +13,8 @@ import Walking from './icons8-walking.png';
  * All images were obtained via https://icons8.com with the theme Office.
  */
 module.exports = {
+  Corgi,
+  Dog,
   Family,
   FireHydrant,
   Hamburger,
