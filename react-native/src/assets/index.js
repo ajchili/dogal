@@ -1,1 +1,5 @@
-exports.images = require('./images');
+import Images from './images';
+
+module.exports = {
+  Images
+};
