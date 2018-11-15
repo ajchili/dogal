@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import {
-  ActivityIndicator,
   Alert,
   AsyncStorage,
   KeyboardAvoidingView,
@@ -12,7 +11,8 @@ import {
 } from 'react-native';
 import { StackActions, NavigationActions } from 'react-navigation';
 import axios from 'axios';
-import Trust from "../assets/icons8-trust.png";
+import { Family } from '../assets/images';
+import { LoadingIndicator } from '../components';
 
 class Start extends Component {
   static navigationOptions = {
@@ -172,9 +172,8 @@ class Start extends Component {
         {loaded && !loadedUsername ? (
             <View>
               <View style={styles.imageContainer}>
-                <Image source={Trust}
-                       style={styles.image}
-                       blurRadius={.2} />
+                <Image source={Family}
+                       style={styles.image} />
               </View>
               <Text style={styles.title}>
                 Let's get started
@@ -188,15 +187,15 @@ class Start extends Component {
                          onSubmitEditing={this._validateUsername}
                          value={username} />
             </View>
-        ) : ( 
-          <ActivityIndicator/>
+        ) : (
+          <LoadingIndicator />
         )}
       </KeyboardAvoidingView>
     );
   }
 }
 
-const imageSize = 175;
+const imageSize = 100;
 
 const styles = StyleSheet.create({
   container: {
