@@ -4,6 +4,7 @@ import Family from './icons8-family.png';
 import FireHydrant from './icons8-fire-hydrant.png';
 import Hamburger from './icons8-hamburger.png';
 import Load from './icons8-load.png';
+import NameTag from './icons8-name-tag.png';
 import Pancake from './icons8-pancake.png';
 import Poop from './icons8-poop.png';
 import Spaghetti from './icons8-spaghetti.png';
@@ -19,6 +20,7 @@ module.exports = {
   FireHydrant,
   Hamburger,
   Load,
+  NameTag,
   Pancake,
   Poop,
   Spaghetti,
