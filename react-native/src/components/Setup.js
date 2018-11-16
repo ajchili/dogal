@@ -8,7 +8,9 @@ import {
   TextInput,
   View
 } from 'react-native';
+import PropTypes from 'prop-types';
 import {
+  Dog,
   Family,
   User
 } from "../dogal";
@@ -33,9 +35,7 @@ class Setup extends Component {
   _checkForUsername = () => {
     User.getUsername()
       .then(username => {
-        this.setState({
-          screen: !!username ? 1 : 0
-        });
+        this.setState({screen: !!username ? 1 : 0});
         if (!!username) this._checkForFamily();
         else this.setState({loaded: true});
       })
@@ -47,14 +47,22 @@ class Setup extends Component {
   _checkForFamily = () => {
     Family.getId()
       .then(id => {
-        this.setState({
-          screen: !!id ? 2 : 1,
-          loaded: true
-        });
+        this.setState({screen: !!id ? 2 : 1});
+        if (!!id) this._checkForDogs(id);
+        else this.setState({loaded: true});
       })
       .catch(err => {
         console.error(err);
       });
+  };
+
+  _checkForDogs = family => {
+    Dog.getDogsInFamily(family)
+      .then(dogs => {
+        if (dogs.length) this.props.onComplete();
+        else this.setState({loaded: true});
+      })
+      .catch(() => this._displayError);
   };
 
   _setUsername = () => {
@@ -115,7 +123,7 @@ class Setup extends Component {
   };
 
   _joinFamily = family => {
-    if (family.length) {
+    if (family.trim().length) {
       User.getId()
         .then(id => {
           Family.join(id, family.trim())
@@ -127,6 +135,33 @@ class Setup extends Component {
       Alert.alert(
         'Invalid Family Id',
         'No family id provided!'
+      );
+    }
+  };
+
+  _createDog = () => {
+    const {dog} = this.state;
+
+    this.setState({preformingNetworkAction: true});
+
+    if (dog.trim().length) {
+      Family.getId()
+        .then(id => {
+          Dog.create(dog.trim(), id)
+            .then(() => this.props.onComplete())
+            .catch(() => {
+              this.setState({preformingNetworkAction: false});
+              this._displayError();
+            });
+        })
+        .catch(() => {
+          this.setState({preformingNetworkAction: false});
+          this._displayError();
+        });
+    } else {
+      Alert.alert(
+        'Invalid Dog Name',
+        'No dog name provided!'
       );
     }
   };
@@ -174,6 +209,11 @@ class Setup extends Component {
                              family: value
                            });
                            break;
+                         case 2:
+                           this.setState({
+                             dog: value
+                           });
+                           break;
                        }
                      }}
                      onSubmitEditing={() => {
@@ -183,6 +223,9 @@ class Setup extends Component {
                            break;
                          case 1:
                            this._setFamily();
+                           break;
+                         case 2:
+                           this._createDog();
                            break;
                        }
                      }}
@@ -195,6 +238,10 @@ class Setup extends Component {
     }
   }
 }
+
+Setup.propTypes = {
+  onComplete: PropTypes.func.isRequired
+};
 
 const styles = StyleSheet.create({
   container: {
