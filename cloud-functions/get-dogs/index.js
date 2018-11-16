@@ -3,16 +3,19 @@ const Datastore = require('@google-cloud/datastore');
 
 const projectId = 'dogal-220802';
 
-exports.getUsers = (req, res) => {
+exports.getDogs = (req, res) => {
   cors(req, res, () => {
     if (req.method !== 'GET') {
       res.status(404).send('Method must be of type GET!');
+    } else if (!req.query.family) {
+      res.status(400).send('Missing family of dog(s)!');
     } else {
       const datastore = new Datastore({ projectId });
 
       let query = datastore
-        .createQuery('Users');
-      
+        .createQuery('Dogs')
+        .filter('family', '=', req.query.family);
+
       datastore
         .runQuery(query)
         .then(results => {
@@ -30,4 +33,4 @@ exports.getUsers = (req, res) => {
         });
     }
   });
-}
+};
