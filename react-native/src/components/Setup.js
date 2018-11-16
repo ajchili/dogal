@@ -8,19 +8,22 @@ import {
   TextInput,
   View
 } from 'react-native';
-import {User} from "../dogal";
 import {
   Family,
-  NameTag,
-  Dog
-} from '../assets/images';
-import LoadingIndicator from "./LoadingIndicator";
+  User
+} from "../dogal";
+import {Images} from '../assets';
+import LoadingIndicator from './LoadingIndicator';
+import LoadingIndicatorOverlay from './LoadingIndicatorOverlay';
 
 class Setup extends Component {
   state = {
     screen: -1,
     username: '',
-    family: ''
+    family: '',
+    dog: '',
+    loaded: false,
+    preformingNetworkAction: false,
   };
 
   componentDidMount() {
@@ -33,6 +36,21 @@ class Setup extends Component {
         this.setState({
           screen: !!username ? 1 : 0
         });
+        if (!!username) this._checkForFamily();
+        else this.setState({loaded: true});
+      })
+      .catch(err => {
+        console.error(err);
+      });
+  };
+
+  _checkForFamily = () => {
+    Family.getId()
+      .then(id => {
+        this.setState({
+          screen: !!id ? 2 : 1,
+          loaded: true
+        });
       })
       .catch(err => {
         console.error(err);
@@ -42,10 +60,20 @@ class Setup extends Component {
   _setUsername = () => {
     const {username} = this.state;
 
+    this.setState({preformingNetworkAction: true});
+
     if (username.trim().length >= 3) {
       User.setUsername(username)
-        .then(() => this.setState({screen: 1}))
-        .catch(() => this._displayError());
+        .then(() => {
+          this.setState({
+            screen: 1,
+            preformingNetworkAction: false
+          });
+        })
+        .catch(() => {
+          this.setState({preformingNetworkAction: false});
+          this._displayError();
+        });
     } else {
       Alert.alert(
         'Invalid Username',
@@ -56,10 +84,51 @@ class Setup extends Component {
 
   _setFamily = () => {
     const {family} = this.state;
+
+    this.setState({preformingNetworkAction: true});
+
+    if (family.trim().length >= 3) {
+      User.getId()
+        .then(id => {
+          Family.create(id, family.trim())
+            .then(() => {
+              this.setState({
+                screen: 2,
+                preformingNetworkAction: false
+              });
+            })
+            .catch(() => {
+              this.setState({preformingNetworkAction: false});
+              this._displayError();
+            });
+        })
+        .catch(() => {
+          this.setState({preformingNetworkAction: false});
+          this._displayError();
+        });
+    } else {
+      Alert.alert(
+        'Invalid Family Name',
+        'Your family name must be at least 3 characters long!'
+      );
+    }
   };
 
   _joinFamily = family => {
-
+    if (family.length) {
+      User.getId()
+        .then(id => {
+          Family.join(id, family.trim())
+            .then(() => this.setState({screen: 2}))
+            .catch(() => this._displayError());
+        })
+        .catch(() => this._displayError());
+    } else {
+      Alert.alert(
+        'Invalid Family Id',
+        'No family id provided!'
+      );
+    }
   };
 
   _displayError = () => {
@@ -70,59 +139,59 @@ class Setup extends Component {
   };
 
   render() {
-    const { screen } = this.state;
+    const { screen, loaded, preformingNetworkAction } = this.state;
 
-    switch (screen) {
-      case -1:
-        return (
-          <View style={styles.loadingContainer}>
-            <LoadingIndicator/>
+    const loadingView = <View style={styles.loadingContainer}>
+      <LoadingIndicator/>
+    </View>;
+
+    if (!loaded) {
+      return (loadingView);
+    } else {
+      return (
+        <View>
+          <LoadingIndicatorOverlay hidden={!preformingNetworkAction} />
+          <View style={styles.imageContainer}>
+            <Image source={screens[screen].image}
+                   style={styles.image} />
           </View>
-        );
-      default:
-        return (
-          <View>
-            <View style={styles.imageContainer}>
-              <Image source={screens[screen].image}
-                     style={styles.image} />
-            </View>
-            <Text style={styles.title}>
-              {screens[screen].title}
-            </Text>
-            <Text style={styles.subTitle}>
-              {screens[screen].subTitle}
-            </Text>
-            <TextInput placeholder={screens[screen].inputPlaceholder}
-                       onChangeText={value => {
-                         switch (screen) {
-                           case 0:
-                             this.setState({
-                               username: value
-                             });
-                             break;
-                           case 1:
-                             this.setState({
-                               family: value
-                             });
-                             break;
-                         }
-                       }}
-                       onSubmitEditing={() => {
-                         switch (screen) {
-                           case 0:
-                             this._setUsername();
-                             break;
-                           case 1:
-                             this._setFamily();
-                             break;
-                         }
-                       }}
-                       style={styles.input}/>
-            <View style={styles.extraContentContainer}>
-              {screens[screen].extraContent}
-            </View>
+          <Text style={styles.title}>
+            {screens[screen].title}
+          </Text>
+          <Text style={styles.subTitle}>
+            {screens[screen].subTitle}
+          </Text>
+          <TextInput placeholder={screens[screen].inputPlaceholder}
+                     onChangeText={value => {
+                       switch (screen) {
+                         case 0:
+                           this.setState({
+                             username: value
+                           });
+                           break;
+                         case 1:
+                           this.setState({
+                             family: value
+                           });
+                           break;
+                       }
+                     }}
+                     onSubmitEditing={() => {
+                       switch (screen) {
+                         case 0:
+                           this._setUsername();
+                           break;
+                         case 1:
+                           this._setFamily();
+                           break;
+                       }
+                     }}
+                     style={styles.input} />
+          <View style={styles.extraContentContainer}>
+            {screens[screen].extraContent}
           </View>
-        );
+        </View>
+      );
     }
   }
 }
@@ -184,19 +253,20 @@ const screens = [
     title: 'Let\'s get started',
     subTitle: 'please enter a username',
     inputPlaceholder: 'Username',
-    image: NameTag
+    image: Images.NameTag
   },
   {
     title: 'Create a family',
-    subTitle: 'or join one below',
+    subTitle: 'or join one',
     inputPlaceholder: 'Family Name',
-    image: Family,
+    image: Images.Family,
     extraContent: <Button title={"Join"}/>
   },
   {
-    title: 'Add dogs!',
-    subTitle: '',
-    image: Dog
+    title: 'Add a dog',
+    subTitle: 'to get started with dogal',
+    inputPlaceholder: 'Dog Name',
+    image: Math.random() > .5 ? Images.Dog : Images.Corgi
   }
 ];
 
