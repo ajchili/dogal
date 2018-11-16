@@ -13,30 +13,45 @@ exports.joinFamily = (req, res) => {
       res.status(400).send('Missing user id!');
     } else {
       const datastore = new Datastore({ projectId });
-      const transaction = datastore.transaction();
-      const userKey = datastore.key(['Users', parseInt(req.body.id)]);
 
-      transaction
-        .run()
-        .then(() => transaction.get(userKey))
+      let query = datastore
+        .createQuery('Families')
+        .filter('__key__', '=', datastore.key(['Families', parseInt(req.body.family)]));
+
+      datastore
+        .runQuery(query)
         .then(results => {
-          let user = results[0];
-          if (user) {
-            user.family = req.body.family;
-            transaction.save({
-              key: userKey,
-              data: user,
-            });
-            return transaction.commit();
-          } else {
-            console.log(results);
-            res.status(404).send();
-          }
+          if (results[0].length === 1) {
+            const transaction = datastore.transaction();
+            const userKey = datastore.key(['Users', parseInt(req.body.id)]);
+
+            transaction
+              .run()
+              .then(() => transaction.get(userKey))
+              .then(results => {
+                let user = results[0];
+                if (user) {
+                  user.family = req.body.family;
+                  transaction.save({
+                    key: userKey,
+                    data: user,
+                  });
+                  return transaction.commit();
+                } else {
+                  console.log(results);
+                  res.status(404).send();
+                }
+              })
+              .then(() => res.status(200).send())
+              .catch(err => {
+                console.error(err);
+                transaction.rollback(() => res.status(500).send());
+              });
+          } else res.status(404).send();
         })
-        .then(() => res.status(200).send())
         .catch(err => {
-          console.error(err);
-          transaction.rollback(() => res.status(500).send());
+          console.error('ERROR:', err);
+          res.status(500).send();
         });
     }
   });
