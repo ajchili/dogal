@@ -26,7 +26,7 @@ module.exports = {
       }
     });
   },
-  create: name => {
+  create: (id, name) => {
     return new Promise(async (resolve, reject) => {
       if (!!name) {
         axios({
@@ -37,7 +37,11 @@ module.exports = {
           }
         })
           .then(async res => {
-            if (res.status === 200) return module.exports.setId(res.data.id);
+            if (res.status === 200) {
+              module.exports.join(id, res.data.id)
+                .then(() => resolve())
+                .catch(err => reject(err));
+            }
             else reject(res.data);
           })
           .catch(err => reject(err));
@@ -56,7 +60,11 @@ module.exports = {
           }
         })
           .then(res => {
-            if (res.status === 200) return module.exports.setId(res.data.id);
+            if (res.status === 200) {
+              module.exports.setId(family)
+                .then(() => resolve())
+                .catch(err => reject(err));
+            }
             else reject(res.data);
           })
           .catch(err => reject(err));
