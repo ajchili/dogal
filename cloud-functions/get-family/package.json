@@ -1,0 +1,26 @@
+{
+  "name": "get-family",
+  "version": "1.0.0",
+  "description": "Gets Family for Dogal app.",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "deploy": "gcloud functions deploy getFamily --runtime nodejs8 --trigger-http",
+    "describe": "gcloud functions describe getFamily",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ajchili/dogal.git"
+  },
+  "author": "Kirin Patel",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ajchili/dogal/issues"
+  },
+  "homepage": "https://github.com/ajchili/dogal#readme",
+  "dependencies": {
+    "@google-cloud/datastore": "^2.0.0",
+    "cors": "^2.8.4"
+  }
+}
