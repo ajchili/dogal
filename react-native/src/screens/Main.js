@@ -16,14 +16,19 @@ import {
   DogCard,
   LoadingIndicator
 } from '../components';
-import {User} from '../dogal';
+import {
+  Family,
+  User
+} from '../dogal';
 
 const {width} = Dimensions.get('window');
 let ably, channel;
 
-class Start extends Component {
-  static navigationOptions = {
-    title: 'Your Family'
+class Main extends Component {
+  static navigationOptions = ({navigation}) => {
+    return {
+      title: navigation.getParam('title', 'Your Family')
+    };
   };
 
   state = {
@@ -91,6 +96,8 @@ class Start extends Component {
   componentDidMount() {
     this._loadUserData();
     this._loadUsers();
+    Family.getName()
+      .then(name => this.props.navigation.setParams({title: name}));
   }
 
   _loadUserData = () => {
@@ -366,4 +373,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default Start;
+export default Main;

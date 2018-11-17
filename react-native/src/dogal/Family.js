@@ -26,6 +26,26 @@ module.exports = {
       }
     });
   },
+  getName: () => {
+    return new Promise((resolve, reject) => {
+      module.exports.getId()
+        .then(id => {
+          axios({
+            method: 'GET',
+            url: 'https://us-central1-dogal-220802.cloudfunctions.net/getFamily',
+            params: {
+              id
+            }
+          })
+            .then(res => {
+              if (res.status === 200) resolve(res.data.name);
+              else reject(res.data);
+            })
+            .catch(err => reject(err));
+        })
+        .catch(err => reject(err));
+    });
+  },
   create: (id, name) => {
     return new Promise(async (resolve, reject) => {
       if (!!name) {
