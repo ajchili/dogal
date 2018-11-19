@@ -1,11 +1,15 @@
 import {AsyncStorage} from 'react-native';
 import axios from 'axios';
 
+let id = null;
+
 module.exports = {
   getId: () => {
     return new Promise(async (resolve, reject) => {
+      if (id) return resolve(id);
       try {
         const value = await AsyncStorage.getItem('family');
+        id = value;
         resolve(value);
       } catch (err) {
         reject(err);
@@ -89,6 +93,23 @@ module.exports = {
           })
           .catch(err => reject(err));
       } else reject(new Error('No id or family provided!'));
+    });
+  },
+  getDogs: () => {
+    return new Promise((resolve, reject) => {
+      module.exports.getId()
+        .then(id => {
+            axios({
+              method: 'GET',
+              url: 'https://us-central1-dogal-220802.cloudfunctions.net/getDogs',
+              params: {
+                family: id
+              }
+            })
+              .then(res => resolve(res.data))
+              .catch(err => reject(err));
+        })
+        .catch(err => reject(err));
     });
   }
 };

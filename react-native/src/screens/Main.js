@@ -96,6 +96,9 @@ class Main extends Component {
   componentDidMount() {
     this._loadUserData();
     this._loadUsers();
+    Family.getDogs()
+      .then(dogs => alert(JSON.stringify(dogs)))
+      .catch(() => this._displayError());
     Family.getName()
       .then(name => this.props.navigation.setParams({title: name}));
   }

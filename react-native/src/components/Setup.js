@@ -48,7 +48,7 @@ class Setup extends Component {
     Family.getId()
       .then(id => {
         this.setState({screen: !!id ? 2 : 1});
-        if (!!id) this._checkForDogs(id);
+        if (!!id) this._checkForDogs();
         else this.setState({loaded: true});
       })
       .catch(err => {
@@ -56,8 +56,8 @@ class Setup extends Component {
       });
   };
 
-  _checkForDogs = family => {
-    Dog.getDogsInFamily(family)
+  _checkForDogs = () => {
+    Family.getDogs()
       .then(dogs => {
         if (dogs.length) this.props.onComplete();
         else this.setState({loaded: true});
