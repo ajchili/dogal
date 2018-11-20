@@ -31,10 +31,22 @@ exports.getDogStatus = (req, res) => {
               dinner: false
             },
             potty: {
-              morning: false,
-              noon: false,
-              afternoon: false,
-              night: false
+              morning: {
+                pee: false,
+                poo: false
+              },
+              noon: {
+                pee: false,
+                poo: false
+              },
+              afternoon: {
+                pee: false,
+                poo: false
+              },
+              night: {
+                pee: false,
+                poo: false
+              }
             },
             walk: {
               morning: false,
@@ -49,7 +61,15 @@ exports.getDogStatus = (req, res) => {
             let resultStatus = JSON.parse(result.status);
             Object.keys(resultStatus).forEach(key => {
               Object.keys(resultStatus[key]).forEach(subKey => {
-                status[key][subKey] = resultStatus[key][subKey];
+                if (typeof resultStatus[key][subKey] === 'object') {
+                  let hasKeys = !!Object.keys(status[key][subKey]).length;
+                  if (hasKeys) {
+                    status[key][subKey] = {
+                      ...status[key][subKey],
+                      ...resultStatus[key][subKey]
+                    };
+                  }
+                } else status[key][subKey] = resultStatus[key][subKey];
               });
             });
           });
