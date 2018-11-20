@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import {
   Alert,
-  AsyncStorage,
   Dimensions,
   FlatList,
   KeyboardAvoidingView,
@@ -17,6 +16,7 @@ import {
   LoadingIndicator
 } from '../components';
 import {
+  Dog,
   Family,
   User
 } from '../dogal';
@@ -35,79 +35,19 @@ class Main extends Component {
     username: null,
     id: null,
     users: [],
-    dogs: [
-      {
-        name: 'Alaska',
-        food: {
-          breakfast: false,
-          lunch: false,
-          dinner: false
-        },
-        potty: {
-          morning: {
-            pee: false,
-            poo: false
-          },
-          noon: {
-            pee: false,
-            poo: false
-          },
-          night: {
-            pee: false,
-            poo: false
-          }
-        },
-        walk: {
-          morning: false,
-          noon: false,
-          night: false
-        }
-      },
-      {
-        name: 'Eric',
-        food: {
-          breakfast: false,
-          lunch: false,
-          dinner: false
-        },
-        potty: {
-          morning: {
-            pee: false,
-            poo: false
-          },
-          noon: {
-            pee: false,
-            poo: false
-          },
-          night: {
-            pee: false,
-            poo: false
-          }
-        },
-        walk: {
-          morning: false,
-          noon: false,
-          night: false
-        }
-      }
-    ]
+    dogs: []
   };
 
   componentDidMount() {
     this._loadUserData();
-    this._loadUsers();
-    Family.getDogs()
-      .then(dogs => alert(JSON.stringify(dogs)))
-      .catch(() => this._displayError());
-    Family.getName()
-      .then(name => this.props.navigation.setParams({title: name}));
+    this._loadFamilyData();
   }
 
   _loadUserData = () => {
     User.getId()
       .then(id => {
         this.setState({id});
-        this._setupAbly(id);
+        // this._setupAbly(id);
       })
       .catch(() => this._displayError());
     User.getUsername()
@@ -115,14 +55,33 @@ class Main extends Component {
       .catch(() => this._displayError());
   };
 
+  _loadFamilyData = () => {
+    Family.getDogs()
+      .then(dogs => {
+        this.setState({dogs});
+        dogs.forEach(dog => {
+          Dog.getStatus(dog.id)
+            .then(status => {
+              let dogsCopy = JSON.parse(JSON.stringify(this.state.dogs));
+              let index = dogsCopy.findIndex(_dog => _dog.id === dog.id);
+              dogsCopy[index] = {
+                ...dogsCopy[index],
+                ...status
+              };
+              this.setState({dogs: dogsCopy});
+            })
+            .catch(() => this._displayError());
+        });
+      })
+      .catch(() => this._displayError());
+    Family.getName()
+      .then(name => this.props.navigation.setParams({title: name}));
+  };
+
   _displayError = () => {
     Alert.alert(
-      'An Error Occurred!',
-      'This is bad, please try again after restarting the app.',
-      [
-        {text: 'OK'},
-      ],
-      {cancelable: false}
+      'An Error Occurred',
+      'Oops, please try again after restarting the app.'
     );
   };
 
@@ -200,39 +159,6 @@ class Main extends Component {
     });
   };
 
-  _loadUsers = () => {
-    axios({
-      method: 'GET',
-      url: 'https://us-central1-dogal-220802.cloudfunctions.net/getUsers'
-    })
-      .then(res => {
-        if (res.status === 200) {
-          this.setState({
-            users: res.data
-          });
-        } else {
-          Alert.alert(
-            'Unable to Connect to Server',
-            'Please check your internet connection and re-start the app.',
-            [
-              {text: 'OK'},
-            ],
-            {cancelable: false}
-          );
-        }
-      })
-      .catch(() => {
-        Alert.alert(
-          'Unable to Connect to Server',
-          'Please check your internet connection and re-start the app.',
-          [
-            {text: 'OK'},
-          ],
-          {cancelable: false}
-        )
-      });
-  };
-
   _handleAblyMessage = message => {
     let data = message.data;
     // Copies array to prevent mutation of state.
@@ -262,70 +188,44 @@ class Main extends Component {
     }
   };
 
-  _handleUpdateFoodStatus = (dog, time, value) => {
-    // Copies array to prevent mutation of state.
+  _handleUpdateStatus = (id, status) => {
     let dogsCopy = JSON.parse(JSON.stringify(this.state.dogs));
-    dogsCopy[dog === 'Alaska' ? 0 : 1].food[time] = value;
-    this.setState({
-      dogs: dogsCopy
-    });
-    if (channel) {
-      channel.publish('food-status', {
-        dog: dog === 'Alaska' ? 0 : 1,
-        time,
-        fed: value
+    let index = dogsCopy.findIndex(dog => dog.id === id);
+    Object.keys(status).forEach(key => {
+      Object.keys(status[key]).forEach(subKey => {
+        let hasKeys = !!Object.keys(status[key][subKey]).length;
+        if (hasKeys) {
+          dogsCopy[index][key][subKey] = {
+            ...dogsCopy[index][key][subKey],
+            ...status[key][subKey]
+          };
+        } else {
+          dogsCopy[index][key] = {
+            ...dogsCopy[index][key],
+            ...status[key]
+          };
+        }
       });
-    }
-  };
-
-  _handleUpdatePottyStatus = (dog, time, type, value) => {
-    // Copies array to prevent mutation of state.
-    let dogsCopy = JSON.parse(JSON.stringify(this.state.dogs));
-    dogsCopy[dog === 'Alaska' ? 0 : 1].potty[time][type] = value;
-    this.setState({
-      dogs: dogsCopy
     });
-    if (channel) {
-      channel.publish('potty-status', {
-        dog: dog === 'Alaska' ? 0 : 1,
-        time,
-        type,
-        potty: value
-      });
-    }
-  };
-
-  _handleUpdateWalkStatus = (dog, time, value) => {
-    // Copies array to prevent mutation of state.
-    let dogsCopy = JSON.parse(JSON.stringify(this.state.dogs));
-    dogsCopy[dog === 'Alaska' ? 0 : 1].walk[time] = value;
-    this.setState({
-      dogs: dogsCopy
-    });
-    if (channel) {
-      channel.publish('walk-status', {
-        dog: dog === 'Alaska' ? 0 : 1,
-        time,
-        walk: value
-      });
-    }
+    this.setState({dogs: dogsCopy});
   };
 
   render() {
-    const {users, dogs} = this.state;
+    const {dogs} = this.state;
 
     let view = (
       <KeyboardAvoidingView behavior="padding">
-        {!users.length ? (
+        {!dogs.length ? (
           <LoadingIndicator/>
         ) : (
           <FlatList
             data={dogs}
             renderItem={({item}) => {
               return (<DogCard dog={item}
-                               handleUpdateFoodStatus={this._handleUpdateFoodStatus}
-                               handleUpdatePottyStatus={this._handleUpdatePottyStatus}
-                               handleUpdateWalkStatus={this._handleUpdateWalkStatus}/>)
+                               handleStatusUpdate={status => {
+                                 this._handleUpdateStatus(item.id, status);
+                               }}
+                               handleStatusUpdateError={err => console.error(err)} />)
             }}
             keyExtractor={item => item.name}/>
         )}

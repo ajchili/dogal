@@ -33,7 +33,7 @@ class Toggle extends Component {
 Toggle.propTypes= {
   onPress: PropTypes.func,
   selected: PropTypes.bool.isRequired,
-  source: PropTypes.object.isRequired
+  source: PropTypes.number.isRequired
 };
 
 export default Toggle;
