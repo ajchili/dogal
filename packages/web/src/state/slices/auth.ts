@@ -35,7 +35,8 @@ const slice = createSlice({
             async (props, thunkApi) => {
                 try {
                     const credential = PhoneAuthProvider.credential(props.verificationId, props.verificationCode);
-                    await signInWithCredential(getAuth(), credential);
+                    const { user } = await signInWithCredential(getAuth(), credential);
+                    await getAuth().updateCurrentUser(user);
                 } catch (error) {
                     throw thunkApi.rejectWithValue(error);
                 }

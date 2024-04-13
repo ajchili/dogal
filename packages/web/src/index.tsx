@@ -1,8 +1,8 @@
 import { createRoot } from 'react-dom/client';
 import "./firebase.js";
-import { Home } from './pages/Home/Home.js';
 import { Provider } from 'react-redux';
 import { store } from './state/store.js';
+import { Router } from './components/Router/Router.js';
 
 const appElement = document.getElementById('app');
 
@@ -11,7 +11,4 @@ if (!appElement) {
 }
 
 const root = createRoot(appElement);
-root.render(<Provider store={store}>
-    <Home />
-</Provider>
-);
+root.render(<Provider store={store}><Router /></Provider>);
