@@ -2,7 +2,7 @@
   "name": "@dogal/empty",
   "version": "1.0.0",
   "workspaces": [
-    "app"
+    "packages/*"
   ],
   "scripts": {
     "start": "turbo start",
