@@ -1,0 +1,19 @@
+{
+  "name": "@dogal/empty",
+  "version": "1.0.0",
+  "workspaces": [
+    "app"
+  ],
+  "scripts": {
+    "start": "turbo start",
+    "lint": "turbo lint"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.4"
+  },
+  "packageManager": "npm@11.4.2",
+  "volta": {
+    "node": "23.11.1",
+    "npm": "11.4.2"
+  }
+}
